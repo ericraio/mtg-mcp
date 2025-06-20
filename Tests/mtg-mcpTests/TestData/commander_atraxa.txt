@@ -1,0 +1,107 @@
+Commander
+1 Atraxa, Praetors' Voice
+
+Deck
+1 Sol Ring
+1 Arcane Signet
+1 Command Tower
+1 Exotic Orchard
+1 Reflecting Pool
+1 City of Brass
+1 Mana Confluence
+4 Forest
+4 Plains
+4 Island
+4 Swamp
+1 Elspeth, Knight-Errant
+1 Jace, the Mind Sculptor
+1 Vraska the Unseen
+1 Ajani, Mentor of Heroes
+1 Tamiyo, the Moon Sage
+1 Doubling Season
+1 Hardened Scales
+1 Corpsejack Menace
+1 Winding Constrictor
+1 Deepglow Skate
+1 Vorel of the Hull Clade
+1 Bred for the Hunt
+1 Fathom Mage
+1 Prime Speaker Zegana
+1 Mycoloth
+1 Forgotten Ancient
+1 Fertilid
+1 Gilder Bairn
+1 Spike Weaver
+1 Triskelion
+1 Walking Ballista
+1 Hangarback Walker
+1 Astral Cornucopia
+1 Everflowing Chalice
+1 Contagion Engine
+1 Inexorable Tide
+1 Viral Drake
+1 Thrummingbird
+1 Evolution Sage
+1 Proliferate
+1 Steady Progress
+1 Tezzeret's Gambit
+1 Fuel for the Cause
+1 Blue Sun's Zenith
+1 Brainstorm
+1 Ponder
+1 Preordain
+1 Cultivate
+1 Kodama's Reach
+1 Rampant Growth
+1 Nature's Lore
+1 Explosive Vegetation
+1 Skyshroud Claim
+1 Urban Evolution
+1 Treasure Cruise
+1 Dig Through Time
+1 Fact or Fiction
+1 Harmonize
+1 Divination
+1 Inspiring Call
+1 Heroic Intervention
+1 Teferi's Protection
+1 Cyclonic Rift
+1 Beast Within
+1 Krosan Grip
+1 Return to Dust
+1 Austere Command
+1 Wrath of God
+1 Supreme Verdict
+1 Damnation
+1 Toxic Deluge
+1 Black Sun's Zenith
+1 Putrefy
+1 Abrupt Decay
+1 Assassin's Trophy
+1 Anguished Unmaking
+1 Vindicate
+1 Mortify
+1 Sultai Charm
+1 Abzan Charm
+1 Bant Charm
+1 Esper Charm
+1 Command the Dreadhorde
+1 Villainous Wealth
+1 Genesis Wave
+1 Tooth and Nail
+1 Green Sun's Zenith
+1 Chord of Calling
+1 Eladamri's Call
+1 Enlightened Tutor
+1 Mystical Tutor
+1 Worldly Tutor
+1 Vampiric Tutor
+1 Demonic Tutor
+1 Diabolic Tutor
+1 Increasing Ambition
+1 Diabolic Intent
+1 Grave Titan
+1 Primeval Titan
+1 Sun Titan
+1 Inferno Titan
+1 Frost Titan
