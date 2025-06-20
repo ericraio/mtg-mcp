@@ -1,7 +1,6 @@
 import Foundation
 import MCP
 import ArgumentParser
-import MTGModels
 import MTGServices
 
 /// Scryfall API MCP Server

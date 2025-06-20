@@ -46,6 +46,15 @@ public struct Card: Identifiable, Equatable, Hashable, Codable, Sendable {
     /// True if this card is a sub face
     public var isFace: Bool
     
+    /// For Modal Double-Faced Cards (MDFCs), stores the front face name
+    public var frontFaceName: String?
+    
+    /// For Modal Double-Faced Cards (MDFCs), stores the back face name
+    public var backFaceName: String?
+    
+    /// True if this is a Modal Double-Faced Card
+    public var isMDFC: Bool
+    
     // MARK: - Computed Properties
     
     /// Returns the converted mana cost of the card
@@ -82,6 +91,20 @@ public struct Card: Identifiable, Equatable, Hashable, Codable, Sendable {
     public var isStandardLegal: Bool {
         return set.isStandardLegal
     }
+    
+    /// For MDFCs, returns the front face name for deck building purposes. For regular cards, returns the full name.
+    public var primaryName: String {
+        return frontFaceName ?? name
+    }
+    
+    /// For MDFCs, returns whether either face is a land
+    public var hasLandFace: Bool {
+        if !isMDFC { return isLand }
+        
+        // For MDFC cards, we can't easily check the back face from Card module
+        // The classification should be done during parsing in DeckParser
+        return isLand || kind.hasLandBackface
+    }
 
     public static func isColorLessManaColor(_ color: String) -> Bool {
         return color == "C"
@@ -105,6 +128,9 @@ public struct Card: Identifiable, Equatable, Hashable, Codable, Sendable {
         self.rarity = .unknown
         self.set = MTGSet()
         self.isFace = false
+        self.frontFaceName = nil
+        self.backFaceName = nil
+        self.isMDFC = false
     }
     
     /// Creates a card with specified properties
@@ -119,7 +145,10 @@ public struct Card: Identifiable, Equatable, Hashable, Codable, Sendable {
         arenaID: Int64 = 0,
         rarity: Rarity = .unknown,
         set: MTGSet = MTGSet(),
-        isFace: Bool = false
+        isFace: Bool = false,
+        frontFaceName: String? = nil,
+        backFaceName: String? = nil,
+        isMDFC: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -132,6 +161,9 @@ public struct Card: Identifiable, Equatable, Hashable, Codable, Sendable {
         self.rarity = rarity
         self.set = set
         self.isFace = isFace
+        self.frontFaceName = frontFaceName
+        self.backFaceName = backFaceName
+        self.isMDFC = isMDFC
         self.allManaCosts = []
         
         // Calculate hash

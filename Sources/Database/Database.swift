@@ -49,7 +49,7 @@ public class CardData {
         print("Starting to load card database...")
         
         // Try to load from main bundle
-        guard let fileURL = Bundle.module.url(forResource: "all_cards", withExtension: "landlord") else {
+        guard let fileURL = Bundle.module.url(forResource: "all_cards", withExtension: "mtgdata") else {
             print("❌ Card database file not found")
             throw CardDataError.fileNotFound
         }

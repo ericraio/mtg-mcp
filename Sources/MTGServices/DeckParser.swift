@@ -287,6 +287,53 @@ public struct DeckParser {
 
         for _ in 0..<entry.quantity {
             var card = Card(name: entry.name)
+            
+            // Check if this is an MDFC (Modal Double-Faced Card)
+            if entry.name.contains(" // ") {
+                let faces = entry.name.components(separatedBy: " // ")
+                if faces.count == 2 {
+                    let frontFace = faces[0].trimmingCharacters(in: .whitespaces)
+                    let backFace = faces[1].trimmingCharacters(in: .whitespaces)
+                    
+                    // Set MDFC properties
+                    card.isMDFC = true
+                    card.frontFaceName = frontFace
+                    card.backFaceName = backFace
+                    card.kind.isMDFC = true
+                    
+                    // For deck building purposes, use the front face name
+                    card.name = frontFace
+                    
+                    // Determine card type based on front face
+                    setCardTypeFromName(card: &card, cardName: frontFace)
+                    
+                    // Check if either face is a land
+                    let frontIsLand = LandDetectionService.isLand(frontFace)
+                    let backIsLand = LandDetectionService.isLand(backFace)
+                    
+                    if frontIsLand {
+                        card.kind.isLand = true
+                        let landCategory = LandDetectionService.getLandCategory(frontFace)
+                        setLandKind(card: &card, category: landCategory)
+                    } else if backIsLand {
+                        // MDFC with land on back face
+                        card.kind.hasLandBackface = true
+                        // For mana curve analysis, treat as non-land since front face is a spell
+                    }
+                }
+            } else {
+                // Regular card (non-MDFC)
+                setCardTypeFromName(card: &card, cardName: entry.name)
+                
+                // Use comprehensive land detection
+                if LandDetectionService.isLand(entry.name) {
+                    card.kind.isLand = true
+                    
+                    // Set specific land subtypes
+                    let landCategory = LandDetectionService.getLandCategory(entry.name)
+                    setLandKind(card: &card, category: landCategory)
+                }
+            }
 
             // Set special designations based on section
             switch section {
@@ -296,15 +343,6 @@ public struct DeckParser {
                 card.kind.isCompanion = true
             default:
                 break
-            }
-
-            // Use comprehensive land detection
-            if LandDetectionService.isLand(entry.name) {
-                card.kind.isLand = true
-
-                // Set specific land subtypes
-                let landCategory = LandDetectionService.getLandCategory(entry.name)
-                setLandKind(card: &card, category: landCategory)
             }
 
             // Store set information if available
@@ -365,6 +403,51 @@ public struct DeckParser {
             return "Land"  // MDFC land faces are typically just "Land"
         case .none:
             return ""
+        }
+    }
+    
+    /// Sets card type based on name patterns for better classification
+    private static func setCardTypeFromName(card: inout Card, cardName: String) {
+        let lowerName = cardName.lowercased()
+        
+        // Common instant patterns
+        if lowerName.contains("bolt") || lowerName.contains("shock") || 
+           lowerName.contains("counter") || lowerName.contains("path to exile") ||
+           lowerName.contains("swords to plowshares") || lowerName.contains("lightning") {
+            card.kind.isInstant = true
+            card.kind.isSpell = true
+        }
+        // Common sorcery patterns
+        else if lowerName.contains("wrath") || lowerName.contains("damnation") ||
+                lowerName.contains("cultivate") || lowerName.contains("kodama's reach") ||
+                lowerName.contains("rampant growth") {
+            card.kind.isSorcery = true
+            card.kind.isSpell = true
+        }
+        // Common artifact patterns
+        else if lowerName.contains("sol ring") || lowerName.contains("signet") ||
+                lowerName.contains("talisman") || lowerName.contains("mox") ||
+                lowerName.contains("lantern") || lowerName.contains("boots") {
+            card.kind.isArtifact = true
+            if lowerName.contains("sol ring") || lowerName.contains("signet") || 
+               lowerName.contains("talisman") || lowerName.contains("mox") {
+                card.kind.isManaRock = true
+            }
+        }
+        // Common enchantment patterns
+        else if lowerName.contains("phyrexian arena") || lowerName.contains("enchantment") ||
+                lowerName.contains("rhystic study") || lowerName.contains("doubling season") {
+            card.kind.isEnchantment = true
+        }
+        // Common planeswalker patterns (many have proper names)
+        else if lowerName.contains("jace") || lowerName.contains("chandra") ||
+                lowerName.contains("liliana") || lowerName.contains("elspeth") ||
+                lowerName.contains("planeswalker") {
+            card.kind.isPlaneswalker = true
+        }
+        // Default to creature for most other cards
+        else if !LandDetectionService.isLand(cardName) {
+            card.kind.isCreature = true
         }
     }
 }

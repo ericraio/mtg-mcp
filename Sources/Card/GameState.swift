@@ -171,22 +171,54 @@ public actor GameState {
         for card in deck {
             // Determine primary card type based on CardKind
             let cardType: String
-            if card.kind.isLand {
-                cardType = "Land"
-            } else if card.kind.isCreature {
-                cardType = "Creature"
-            } else if card.kind.isInstant {
-                cardType = "Instant"
-            } else if card.kind.isSorcery {
-                cardType = "Sorcery"
-            } else if card.kind.isArtifact {
-                cardType = "Artifact"
-            } else if card.kind.isEnchantment {
-                cardType = "Enchantment"
-            } else if card.kind.isPlaneswalker {
-                cardType = "Planeswalker"
+            
+            // For MDFCs, classify based on front face
+            if card.isMDFC {
+                // MDFC with land back face should count toward land total if it has utility
+                if card.kind.hasLandBackface && !card.kind.isLand {
+                    // This is a spell//land MDFC - count as both
+                    if card.kind.isInstant {
+                        cardType = "Instant"
+                    } else if card.kind.isSorcery {
+                        cardType = "Sorcery"
+                    } else if card.kind.isCreature {
+                        cardType = "Creature"
+                    } else if card.kind.isArtifact {
+                        cardType = "Artifact"
+                    } else if card.kind.isEnchantment {
+                        cardType = "Enchantment"
+                    } else if card.kind.isPlaneswalker {
+                        cardType = "Planeswalker"
+                    } else {
+                        cardType = "MDFC Spell"
+                    }
+                    
+                    // Also count the land potential
+                    typeCounts["MDFC Land", default: 0] += 1
+                } else if card.kind.isLand {
+                    cardType = "Land"
+                } else {
+                    cardType = "MDFC"
+                }
             } else {
-                cardType = "Other"
+                // Regular card classification
+                if card.kind.isLand {
+                    cardType = "Land"
+                } else if card.kind.isCreature {
+                    cardType = "Creature"
+                } else if card.kind.isInstant {
+                    cardType = "Instant"
+                } else if card.kind.isSorcery {
+                    cardType = "Sorcery"
+                } else if card.kind.isArtifact {
+                    cardType = "Artifact"
+                } else if card.kind.isEnchantment {
+                    cardType = "Enchantment"
+                } else if card.kind.isPlaneswalker {
+                    cardType = "Planeswalker"
+                } else {
+                    cardType = "Other"
+                }
             }
             
             typeCounts[cardType, default: 0] += 1

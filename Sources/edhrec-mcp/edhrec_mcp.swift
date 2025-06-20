@@ -1,7 +1,6 @@
 import ArgumentParser
 import Foundation
 import MCP
-import MTGModels
 import MTGServices
 
 #if canImport(FoundationNetworking)

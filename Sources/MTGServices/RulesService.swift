@@ -12,15 +12,10 @@ public final class RulesService: Sendable {
             self.rulesDirectory = customDirectory
             self.logger.info("Using custom rules directory: \(customDirectory)")
         } else {
-            // Use bundle resources
-            if let resourcePath = Bundle.module.resourcePath {
-                self.rulesDirectory = resourcePath
-                self.logger.info("Using bundle resources: \(self.rulesDirectory)")
-            } else {
-                // Fallback for development
-                self.rulesDirectory = "rules"
-                self.logger.warning("Using fallback rules directory: \(self.rulesDirectory)")
-            }
+            // Use Database module bundle resources (new location)
+            // For now, use development fallback since bundle access is complex
+            self.rulesDirectory = "Sources/Database/Resources/rules"
+            self.logger.info("Using Database rules directory: \(self.rulesDirectory)")
         }
         
         // Verify rules directory exists

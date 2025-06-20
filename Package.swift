@@ -20,10 +20,9 @@ let package = Package(
             targets: ["edhrec-mcp"]
         ),
         .executable(
-            name: "rules-splitter",
-            targets: ["rules-splitter"]
+            name: "mtg",
+            targets: ["mtg-data-cli"]
         ),
-        .executable(name: "scryfall2landlord", targets: ["scryfall2landlord"]),
     ],
     dependencies: [
         .package(url: "https://github.com/modelcontextprotocol/swift-sdk.git", from: "0.9.0"),
@@ -32,10 +31,12 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "scryfall2landlord",
+            name: "mtg-data-cli",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "SwiftGzip", package: "swift-gzip"),
                 "Scryfall",
+                "Database",
             ]
         ),
         .executableTarget(
@@ -65,12 +66,6 @@ let package = Package(
                 "MTGServices",
             ]
         ),
-        .executableTarget(
-            name: "rules-splitter",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
-            ]
-        ),
         .testTarget(
             name: "mtg-mcpTests",
             dependencies: ["mtg-mcp", "Card", "MTGServices"],
@@ -85,9 +80,6 @@ let package = Package(
                 "Scryfall",
                 "Database",
                 .product(name: "SwiftGzip", package: "swift-gzip"),
-            ],
-            resources: [
-                .copy("Resources")
             ]
         ),
         .target(name: "Bipartite"),
@@ -123,7 +115,9 @@ let package = Package(
                 .product(name: "SwiftGzip", package: "swift-gzip"),
             ],
             resources: [
-                .copy("Resources/all_cards.landlord")
+                .copy("Resources/all_cards.mtgdata"),
+                .copy("Resources/all_rules.mtgdata"),
+                .copy("Resources/rules")
             ]
         ),
         .testTarget(

@@ -26,7 +26,7 @@ install-local: build-release
 	@cp .build/release/mtg-mcp ~/.local/bin/
 	@cp .build/release/scryfall-mcp ~/.local/bin/
 	@cp .build/release/edhrec-mcp ~/.local/bin/
-	@cp .build/release/rules-splitter ~/.local/bin/
+	@cp .build/release/mtg ~/.local/bin/
 	@echo "✅ Installed to ~/.local/bin/"
 
 install-user: build-release
@@ -35,7 +35,7 @@ install-user: build-release
 	@cp .build/release/mtg-mcp ~/bin/
 	@cp .build/release/scryfall-mcp ~/bin/
 	@cp .build/release/edhrec-mcp ~/bin/
-	@cp .build/release/rules-splitter ~/bin/
+	@cp .build/release/mtg ~/bin/
 	@echo "✅ Installed to ~/bin/"
 
 install-system: build-release
@@ -43,7 +43,7 @@ install-system: build-release
 	sudo cp .build/release/mtg-mcp /usr/local/bin/
 	sudo cp .build/release/scryfall-mcp /usr/local/bin/
 	sudo cp .build/release/edhrec-mcp /usr/local/bin/
-	sudo cp .build/release/rules-splitter /usr/local/bin/
+	sudo cp .build/release/mtg /usr/local/bin/
 	@echo "✅ Installed to /usr/local/bin/"
 
 # Default install target
@@ -172,12 +172,22 @@ test-edhrec:
 
 test-rules:
 	@echo "🧪 Testing rules splitter executable:"
-	@if [ -f ~/.local/bin/rules-splitter ]; then \
-		~/.local/bin/rules-splitter --help; \
-	elif [ -f .build/release/rules-splitter ]; then \
-		./.build/release/rules-splitter --help; \
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg --help; \
+	elif [ -f .build/release/mtg ]; then \
+		./.build/release/mtg --help; \
 	else \
-		echo "❌ rules-splitter executable not found. Run 'make install' first."; \
+		echo "❌ mtg executable not found. Run 'make install' first."; \
+	fi
+
+test-data-cli:
+	@echo "🧪 Testing MTG data CLI executable:"
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg --help; \
+	elif [ -f .build/release/mtg ]; then \
+		./.build/release/mtg --help; \
+	else \
+		echo "❌ mtg executable not found. Run 'make install' first."; \
 	fi
 
 test-connection:
@@ -204,6 +214,47 @@ deploy: clean build-release install-local config-update
 deploy-system: clean build-release install-system
 	@echo "🚀 System-wide deployment complete!"
 
+# Data processing commands
+process-cards:
+	@echo "🃏 Processing MTG card data..."
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg cards; \
+	else \
+		swift run mtg cards; \
+	fi
+
+process-rules:
+	@echo "📖 Processing MTG rules data..."
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg rules; \
+	else \
+		swift run mtg rules; \
+	fi
+
+process-all:
+	@echo "🚀 Processing all MTG data..."
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg all; \
+	else \
+		swift run mtg all; \
+	fi
+
+process-force:
+	@echo "🔄 Force processing all MTG data..."
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg all --force; \
+	else \
+		swift run mtg all --force; \
+	fi
+
+verify-data:
+	@echo "🔍 Verifying MTG data integrity..."
+	@if [ -f ~/.local/bin/mtg ]; then \
+		~/.local/bin/mtg verify; \
+	else \
+		swift run mtg verify; \
+	fi
+
 # Cleanup commands
 clean-logs:
 	@echo "🧹 Note: macOS logs are managed by the system and cannot be manually cleared"
@@ -211,8 +262,8 @@ clean-logs:
 
 clean-install:
 	@echo "🧹 Removing installed binaries..."
-	@rm -f ~/.local/bin/mtg-mcp ~/.local/bin/scryfall-mcp ~/.local/bin/edhrec-mcp ~/.local/bin/rules-splitter
-	@rm -f ~/bin/mtg-mcp ~/bin/scryfall-mcp ~/bin/edhrec-mcp ~/bin/rules-splitter
+	@rm -f ~/.local/bin/mtg-mcp ~/.local/bin/scryfall-mcp ~/.local/bin/edhrec-mcp ~/.local/bin/mtg
+	@rm -f ~/bin/mtg-mcp ~/bin/scryfall-mcp ~/bin/edhrec-mcp ~/bin/mtg
 	@echo "✅ Cleaned up installed binaries"
 
 # Status check
@@ -227,6 +278,7 @@ status:
 	@if [ -f ~/.local/bin/mtg-mcp ]; then echo "  ✅ ~/.local/bin/mtg-mcp installed"; else echo "  ❌ ~/.local/bin/mtg-mcp not found"; fi
 	@if [ -f ~/.local/bin/scryfall-mcp ]; then echo "  ✅ ~/.local/bin/scryfall-mcp installed"; else echo "  ❌ ~/.local/bin/scryfall-mcp not found"; fi
 	@if [ -f ~/.local/bin/edhrec-mcp ]; then echo "  ✅ ~/.local/bin/edhrec-mcp installed"; else echo "  ❌ ~/.local/bin/edhrec-mcp not found"; fi
+	@if [ -f ~/.local/bin/mtg ]; then echo "  ✅ ~/.local/bin/mtg installed"; else echo "  ❌ ~/.local/bin/mtg not found"; fi
 	@echo ""
 	@echo "⚙️  Configuration Status:"
 	@if [ -f ~/Library/Application\ Support/Claude/claude_desktop_config.json ]; then echo "  ✅ Claude Desktop config exists"; else echo "  ❌ Claude Desktop config missing"; fi
@@ -260,8 +312,15 @@ help:
 	@echo "  make test-mtg      - Test MTG server executable"
 	@echo "  make test-scryfall - Test Scryfall server executable"
 	@echo "  make test-edhrec   - Test EDHREC server executable"
-	@echo "  make test-rules    - Test rules splitter executable"
+	@echo "  make test-data-cli - Test MTG data CLI executable"
 	@echo "  make test-connection - Test MCP server connection"
+	@echo ""
+	@echo "🗂️  Data Processing Commands:"
+	@echo "  make process-cards - Process MTG card data from Scryfall"
+	@echo "  make process-rules - Process MTG comprehensive rules"
+	@echo "  make process-all   - Process both cards and rules"
+	@echo "  make process-force - Force process all data (ignore cache)"
+	@echo "  make verify-data   - Verify processed data integrity"
 	@echo ""
 	@echo "📋 Logging Commands:"
 	@echo "  make logs          - Show recent logs (10 min)"

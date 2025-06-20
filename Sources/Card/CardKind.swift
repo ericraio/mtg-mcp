@@ -76,6 +76,9 @@ public struct CardKind: Equatable, Hashable, CustomStringConvertible, Sendable {
     
     /// Whether this card has a land on the back face (for modal double-faced cards)
     public var hasLandBackface: CardType = false
+    
+    /// Whether this is a Modal Double-Faced Card
+    public var isMDFC: CardType = false
 
     public var description: String {
         let types = typeList()
@@ -106,7 +109,8 @@ public struct CardKind: Equatable, Hashable, CustomStringConvertible, Sendable {
         isUnknown: CardType = false,
         isCommander: CardType = false,
         isCompanion: CardType = false,
-        hasLandBackface: CardType = false
+        hasLandBackface: CardType = false,
+        isMDFC: CardType = false
     ) {
         self.isLand = isLand
         self.isBasicLand = isBasicLand
@@ -123,6 +127,7 @@ public struct CardKind: Equatable, Hashable, CustomStringConvertible, Sendable {
         self.isCommander = isCommander
         self.isCompanion = isCompanion
         self.hasLandBackface = hasLandBackface
+        self.isMDFC = isMDFC
     }
     
     /// Creates a CardKind with specified land types
@@ -176,6 +181,7 @@ public struct CardKind: Equatable, Hashable, CustomStringConvertible, Sendable {
         isCommander = false
         isCompanion = false
         hasLandBackface = false
+        isMDFC = false
         isUnknown = true
     }
     
@@ -241,6 +247,7 @@ public struct CardKind: Equatable, Hashable, CustomStringConvertible, Sendable {
         if isSpell { types.append("Spell") }
         if isCommander { types.append("Commander") }
         if isCompanion { types.append("Companion") }
+        if isMDFC { types.append("MDFC") }
         if isUnknown { types.append("Unknown") }
         
         return types
@@ -281,6 +288,7 @@ extension CardKind: Codable {
         case isCommander
         case isCompanion
         case hasLandBackface
+        case isMDFC
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -307,6 +315,7 @@ extension CardKind: Codable {
         try container.encode(isCommander, forKey: .isCommander)
         try container.encode(isCompanion, forKey: .isCompanion)
         try container.encode(hasLandBackface, forKey: .hasLandBackface)
+        try container.encode(isMDFC, forKey: .isMDFC)
     }
     
     public init(from decoder: Decoder) throws {
@@ -335,5 +344,6 @@ extension CardKind: Codable {
         isCommander = try container.decodeIfPresent(Bool.self, forKey: .isCommander) ?? false
         isCompanion = try container.decodeIfPresent(Bool.self, forKey: .isCompanion) ?? false
         hasLandBackface = try container.decodeIfPresent(Bool.self, forKey: .hasLandBackface) ?? false
+        isMDFC = try container.decodeIfPresent(Bool.self, forKey: .isMDFC) ?? false
     }
 }
