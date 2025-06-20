@@ -121,7 +121,8 @@ struct MTGDeckManagerServer: AsyncParsableCommand {
                         "deck_list": .object([
                             "type": .string("string"),
                             "description": .string(
-                                "Text format deck list with 'Deck' and 'Sideboard' sections"),
+                                "MTG deck list in standard format. Each card MUST include quantity (e.g., '1 Sol Ring', '4 Lightning Bolt'). Format: 'Commander\\n1 CardName\\n\\nDeck\\n4 CardName\\n1 CardName'. DO NOT omit quantities - every card line must start with a number."
+                            ),
                         ]),
                         "include_analysis": .object([
                             "type": .string("boolean"),
