@@ -163,6 +163,37 @@ public actor GameState {
         let sortedCards = cardCounts.sorted { $0.value > $1.value }
         return Dictionary(uniqueKeysWithValues: Array(sortedCards.prefix(limit)))
     }
+    
+    /// Gets card type breakdown for the deck
+    public func getCardTypeBreakdown() -> [String: Int] {
+        var typeCounts: [String: Int] = [:]
+        
+        for card in deck {
+            // Determine primary card type based on CardKind
+            let cardType: String
+            if card.kind.isLand {
+                cardType = "Land"
+            } else if card.kind.isCreature {
+                cardType = "Creature"
+            } else if card.kind.isInstant {
+                cardType = "Instant"
+            } else if card.kind.isSorcery {
+                cardType = "Sorcery"
+            } else if card.kind.isArtifact {
+                cardType = "Artifact"
+            } else if card.kind.isEnchantment {
+                cardType = "Enchantment"
+            } else if card.kind.isPlaneswalker {
+                cardType = "Planeswalker"
+            } else {
+                cardType = "Other"
+            }
+            
+            typeCounts[cardType, default: 0] += 1
+        }
+        
+        return typeCounts
+    }
 }
 
 /// Represents parsed deck data

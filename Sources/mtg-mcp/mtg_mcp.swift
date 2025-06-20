@@ -731,18 +731,20 @@ struct MTGDeckManagerServer: AsyncParsableCommand {
             return CallTool.Result(content: [.text("Your deck is empty.")])
         }
 
-        let deckContents = await gameState.getDeckContents(limit: 5)
+        // Get actual card type breakdown
+        let cardTypeBreakdown = await gameState.getCardTypeBreakdown()
 
         var result = [
             "Cards in deck: \(stats.cardsInDeck)",
             "Cards in hand: \(stats.cardsInHand)",
             "Sideboard cards: \(stats.sideboardCards)",
             "",
-            "Top card types in deck:",
+            "Card types in deck:",
         ]
 
-        for (name, count) in deckContents.sorted(by: { $0.value > $1.value }) {
-            result.append("  \(count)x \(name)")
+        // Show card types sorted by count
+        for (cardType, count) in cardTypeBreakdown.sorted(by: { $0.value > $1.value }) {
+            result.append("  \(count)x \(cardType)")
         }
 
         if let commander = stats.commander {
@@ -1171,7 +1173,7 @@ struct MTGDeckManagerServer: AsyncParsableCommand {
     ) async throws -> CallTool.Result {
         let startTime = Date()
 
-        guard case .string(let deckList) = arguments["deck_list"] else {
+        guard case .string(let deckListText) = arguments["deck_list"] else {
             throw MCPError.invalidParams("Missing deck_list parameter")
         }
 
@@ -1180,18 +1182,21 @@ struct MTGDeckManagerServer: AsyncParsableCommand {
             arguments["combo_types"]?.arrayValue?.compactMap { $0.stringValue } ?? ["all"]
         let maxPieces = arguments["max_pieces"]?.intValue ?? 4
 
-        // Parse deck list
-        let cards = deckList.components(separatedBy: .newlines)
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-            .compactMap { line -> String? in
-                // Extract card name from deck list format (handle quantities)
-                let components = line.components(separatedBy: " ")
-                if components.count > 1, Int(components[0]) != nil {
-                    return components.dropFirst().joined(separator: " ")
-                }
-                return line
-            }
+        // Use proper DeckParser to parse the deck list
+        let deckData = DeckParser.parseDeckList(deckListText)
+        
+        // Extract all card names from the parsed deck (normalize case and whitespace)
+        var cards: [String] = []
+        cards.append(contentsOf: deckData.mainDeck.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) })
+        cards.append(contentsOf: deckData.sideboard.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) })
+        
+        // Add commander/companion if present
+        if let commander = deckData.commander {
+            cards.append(commander.name.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
+        if let companion = deckData.companion {
+            cards.append(companion.name.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
 
         // Analyze deck for combo potential with structured response
         let (deckCombos, nearMisses, _) = await analyzeDeckCombosStructured(
@@ -2482,8 +2487,9 @@ struct MTGDeckManagerServer: AsyncParsableCommand {
 
             // Only include combos where ALL pieces are in our deck
             for combo in chunkCombos {
-                let comboCardSet = Set(combo.cards)
-                let deckCardSet = Set(cards)
+                // Normalize combo card names for comparison (case-insensitive, trimmed)
+                let comboCardSet = Set(combo.cards.map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() })
+                let deckCardSet = Set(cards.map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() })
                 if comboCardSet.isSubset(of: deckCardSet) {
                     foundCombos.append(combo)
                 }

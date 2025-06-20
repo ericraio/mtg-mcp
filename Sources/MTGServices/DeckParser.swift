@@ -1,6 +1,7 @@
 import Card
 import Foundation
 import Scryfall
+import Database
 
 /// Advanced deck builder with enhanced parsing capabilities from swift-landlord
 public struct DeckParser {
