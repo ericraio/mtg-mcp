@@ -254,7 +254,7 @@ public struct RulesProcessor {
             let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
             
             // Check if this line starts a new numbered section (e.g., "100. General")
-            if let range = trimmedLine.range(of: #"^(\d{3})\.\s+(.+)$"#, options: .regularExpression) {
+            if trimmedLine.range(of: #"^(\d{3})\.\s+(.+)$"#, options: .regularExpression) != nil {
                 // Save previous section if we have content
                 if !currentSection.isEmpty && !currentContent.isEmpty {
                     try saveSection(currentSection, content: currentContent, outputDir: outputDir)

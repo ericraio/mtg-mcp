@@ -5,7 +5,7 @@ import Foundation
 /// the oracle text, we simply keep a map of land cards and the mana cost
 /// we wish them to represent.
 extension Card {
-    public nonisolated(unsafe) static let SPECIAL_LANDS: [String: ManaCost] = [
+    public static let SPECIAL_LANDS: [String: ManaCost] = [
         // Utility Lands
         "Slayers' Stronghold": ManaCost.fromColorCounts(colorless: 1),
         "Alchemist's Refuge": ManaCost.fromColorCounts(colorless: 1),
